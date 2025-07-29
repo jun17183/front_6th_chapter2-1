@@ -1,4 +1,4 @@
-import { PRODUCT_LIST, PRODUCT_DISCOUNT_RATE, DISCOUNT_POLICY, POINTS_POLICY } from "./constants";
+import { PRODUCT_LIST, PRODUCT_DISCOUNT_RATE, DISCOUNT_POLICY, POINTS_POLICY } from './constants.js';
 
 // ===== 전역 변수 =====
 const productList = [];
@@ -20,14 +20,22 @@ export const getProductList = () => {
   return productList;
 }
 
+// 장바구니 목록 조회
+export const getCartList = () => {
+  return cartList;
+}
+
 // 상품 조회
 export const getProductById = (productId) => {
   return productList.find(product => product.id === productId);
 }
 
 // 상품별 할인율 조회
-export const getProductDiscountRate = (productId) => {
-  return PRODUCT_DISCOUNT_RATE[productId];
+export const getProductDiscountRate = (productId, quantity) => {
+  if (quantity >= DISCOUNT_POLICY.INDIVIDUAL_DISCOUNT_THRESHOLD) {
+    return PRODUCT_DISCOUNT_RATE[productId] || 0;
+  }
+  return 0;
 }
 
 // 전체 재고 계산
@@ -44,6 +52,7 @@ export const getLowStockItems = () => {
 export const updateProductStock = (productId, quantity) => {
   const product = getProductById(productId);
   if (product) {
+    console.log(`[재고 업데이트] ${product.name}: ${product.stock}개 -> ${product.stock - quantity}개 (${quantity > 0 ? '차감' : '복원'})`);
     product.stock -= quantity;
   }
 }
@@ -76,8 +85,6 @@ export const resetProductPrices = () => {
 
 // ===== 장바구니 관련 함수들 =====
 
-
-
 // 장바구니 추가
 export const addToCart = (product) => {
   if (!product || !product.id) {
@@ -109,14 +116,99 @@ export const removeFromCart = (product) => {
   }
 }
 
-// 장바구니 총 가격 계산
+// 장바구니 총 가격 계산 (DOM 기반)
 export const calculateTotalPrice = () => {
-  return cartList.reduce((acc, product) => acc + product.price * product.quantity, 0);
-}
+  const cartItems = document.getElementById('cart-items');
+  if (!cartItems || cartItems.children.length === 0) {
+    return 0;
+  }
 
-// 장바구니 총 수량 계산
+  let totalAmount = 0;
+  let totalItemCount = 0;
+
+  // 1단계: 전체 아이템 수량 계산
+  for (let i = 0; i < cartItems.children.length; i++) {
+    const cartItem = cartItems.children[i];
+    const quantityElement = cartItem.querySelector('.quantity-number');
+    const quantity = parseInt(quantityElement.textContent) || 0;
+    totalItemCount += quantity;
+  }
+
+  // 2단계: 대량구매 할인 여부 결정 (30개 이상)
+  if (totalItemCount >= 30) {
+    // 대량구매 할인: 전체 25% 할인 (개별 할인 무시)
+    let subtotal = 0;
+    for (let i = 0; i < cartItems.children.length; i++) {
+      const cartItem = cartItems.children[i];
+      const productId = cartItem.id;
+      const product = getProductById(productId);
+      const quantityElement = cartItem.querySelector('.quantity-number');
+      const quantity = parseInt(quantityElement.textContent) || 0;
+      
+      if (product && quantity > 0) {
+        const itemSubtotal = product.originalPrice * quantity;
+        subtotal += itemSubtotal;
+      }
+    }
+    totalAmount = subtotal * 0.75; // 25% 할인
+  } else {
+    // 개별 상품 할인 적용
+    for (let i = 0; i < cartItems.children.length; i++) {
+      const cartItem = cartItems.children[i];
+      const productId = cartItem.id;
+      const product = getProductById(productId);
+      const quantityElement = cartItem.querySelector('.quantity-number');
+      const quantity = parseInt(quantityElement.textContent) || 0;
+      
+      if (product && quantity > 0) {
+        let itemPrice = product.originalPrice;
+        
+        // 10개 이상 구매 시 개별 할인 적용
+        if (quantity >= 10) {
+          if (productId === 'p1') {
+            itemPrice = product.originalPrice * 0.9;
+          } else if (productId === 'p2') {
+            itemPrice = product.originalPrice * 0.85;
+          } else if (productId === 'p3') {
+            itemPrice = product.originalPrice * 0.8;
+          } else if (productId === 'p4') {
+            itemPrice = product.originalPrice * 0.95;
+          } else if (productId === 'p5') {
+            itemPrice = product.originalPrice * 0.75;
+          }
+        }
+        
+        const itemTotal = itemPrice * quantity;
+        totalAmount += itemTotal;
+      }
+    }
+  }
+
+  // 3단계: 화요일 할인 (10% 추가 할인)
+  if (isTuesday() && totalAmount > 0) {
+    totalAmount = totalAmount * 0.9;
+  }
+
+  return Math.round(totalAmount);
+};
+
+// 장바구니 총 수량 계산 (DOM 기반)
 export const calculateTotalItemCount = () => {
-  return cartList.reduce((acc, product) => acc + product.quantity, 0);
+  const cartItems = document.getElementById('cart-items');
+  if (!cartItems || cartItems.children.length === 0) {
+    return 0;
+  }
+
+  let totalItemCount = 0;
+  
+  for (let i = 0; i < cartItems.children.length; i++) {
+    const cartItem = cartItems.children[i];
+    const quantityElement = cartItem.querySelector('.quantity-number');
+    const quantity = parseInt(quantityElement.textContent) || 0;
+    totalItemCount += quantity;
+  }
+  
+  return totalItemCount;
 }
 
 // 장바구니 수량 변경
@@ -202,7 +294,8 @@ export const startLightningSale = () => {
   const randomIndex = Math.floor(Math.random() * availableProducts.length);
   const luckyProduct = availableProducts[randomIndex];
   
-  luckyProduct.price = Math.round(luckyProduct.originalPrice * (1 - DISCOUNT_POLICY.LIGHTNING_SALE_RATE));
+  // 원본과 동일하게 현재 가격 기준으로 20% 할인 적용
+  luckyProduct.price = Math.round(luckyProduct.price * (1 - DISCOUNT_POLICY.LIGHTNING_SALE_RATE));
   luckyProduct.isOnSale = true;
   
   return luckyProduct;
@@ -219,6 +312,7 @@ export const startSuggestedSale = (lastSelectedProductId) => {
   );
   
   if (suggestedProduct) {
+    // 원본과 동일하게 현재 가격 기준으로 5% 할인 적용
     suggestedProduct.price = Math.round(suggestedProduct.price * (1 - DISCOUNT_POLICY.SUGGESTED_SALE_RATE));
     suggestedProduct.isSuggestedSale = true;
   }
@@ -278,3 +372,48 @@ export const calculateBonusPoints = () => {
 
   return bonusPoints;
 }
+
+// 보너스 포인트 텍스트 생성
+export const getBonusPointsText = () => {
+  const cartItems = document.getElementById('cart-items').children;
+  let totalItemCount = 0;
+  const productIds = [];
+  const bonusDetails = [];
+  
+  // DOM 요소를 직접 순회하여 계산
+  for (let i = 0; i < cartItems.length; i++) {
+    const cartItem = cartItems[i];
+    const productId = cartItem.id;
+    const quantityElement = cartItem.querySelector('.quantity-number');
+    const quantity = parseInt(quantityElement.textContent);
+    
+    if (quantity > 0) {
+      totalItemCount += quantity;
+      productIds.push(productId);
+    }
+  }
+
+  // 키보드+마우스 세트 보너스
+  const hasKeyboard = productIds.includes('p1');
+  const hasMouse = productIds.includes('p2');
+  if (hasKeyboard && hasMouse) {
+    bonusDetails.push('키보드+마우스 세트');
+  }
+
+  // 풀세트 보너스 (키보드+마우스+모니터암)
+  const hasMonitorArm = productIds.includes('p3');
+  if (hasKeyboard && hasMouse && hasMonitorArm) {
+    bonusDetails.push('풀세트 구매');
+  }
+
+  // 수량별 보너스
+  if (totalItemCount >= 30) {
+    bonusDetails.push('대량구매(30개+)');
+  } else if (totalItemCount >= 20) {
+    bonusDetails.push('대량구매(20개+)');
+  } else if (totalItemCount >= 10) {
+    bonusDetails.push('대량구매(10개+)');
+  }
+
+  return bonusDetails.length > 0 ? bonusDetails.join(', ') : '없음';
+};

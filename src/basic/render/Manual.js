@@ -81,36 +81,3 @@ export const Manual = /*html*/ `
     </div>
   </div>
 `;
-
-// 매뉴얼 토글 버튼 클릭 이벤트 - 매뉴얼 패널 표시/숨김
-export const toggleManual = () => {
-  const manualOverlay = document.getElementById('manual-overlay');
-  const manualPanel = document.getElementById('manual-panel');
-  
-  if (!manualOverlay || !manualPanel) return;
-  
-  manualOverlay.classList.toggle('hidden');
-  manualPanel.classList.toggle('translate-x-full');
-};
-
-// 매뉴얼 닫기 - 배경 클릭 시 닫기
-export const closeManualOnOverlayClick = () => {
-  const manualOverlay = document.getElementById('manual-overlay');
-  const manualPanel = document.getElementById('manual-panel');
-  
-  if (!manualOverlay || !manualPanel) return;
-  
-  manualOverlay.classList.add('hidden');
-  manualPanel.classList.add('translate-x-full');
-};
-
-// 매뉴얼 닫기 버튼 클릭 이벤트
-export const closeManualOnButtonClick = () => {
-  const manualOverlay = document.getElementById('manual-overlay');
-  const manualPanel = document.getElementById('manual-panel');
-  
-  if (!manualOverlay || !manualPanel) return;
-  
-  manualOverlay.classList.add('hidden');
-  manualPanel.classList.add('translate-x-full');
-};

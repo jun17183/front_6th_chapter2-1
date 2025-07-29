@@ -61,6 +61,8 @@ export const updateCartItemPrices = () => {
       const priceDiv = cartItems[i].querySelector('.text-lg');
       const nameDiv = cartItems[i].querySelector('h3');
       const priceTextDiv = cartItems[i].querySelector('.text-xs.text-black');
+      const quantityElement = cartItems[i].querySelector('.quantity-number');
+      const quantity = quantityElement ? parseInt(quantityElement.textContent) : 0;
 
       // 할인 상태에 따른 가격 표시
       if (product.isOnSale && product.isSuggestedSale) {
@@ -87,6 +89,13 @@ export const updateCartItemPrices = () => {
         if (priceTextDiv) {
           priceTextDiv.textContent = '₩' + product.price.toLocaleString();
         }
+      }
+
+      // 10개 이상 구매 시 굵은 글씨 표시
+      if (quantity >= 10) {
+        priceDiv.style.fontWeight = 'bold';
+      } else {
+        priceDiv.style.fontWeight = 'normal';
       }
     }
   }
