@@ -84,6 +84,7 @@ export const updateStockInfo = () => {
   
   // 모든 상품의 재고 상태를 체크
   productList.forEach(product => {
+
     if (product.stock === 0) {
       // 품절 상품
       stockMessages.push(`${product.name}: 품절`);
@@ -95,7 +96,7 @@ export const updateStockInfo = () => {
   
   // 재고 상태 메시지 표시
   if (stockMessages.length > 0) {
-    stockInfoElement.textContent = stockMessages.join('\n');
+    stockInfoElement.textContent = stockMessages.join(' | ');
     stockInfoElement.style.display = 'block';
   } else {
     stockInfoElement.textContent = '';

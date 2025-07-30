@@ -1,10 +1,12 @@
 import { 
   getProductById, 
+  getProductList,
   updateProductStock, 
   restoreProductStock,
   addToCart,
   removeFromCart
 } from "../data/index.js";
+import { PRODUCT_LIST } from "../data/constants.js";
 
 import { updateHeaderItemCount } from "../render/Header.js";
 import { updateCartSelectOptions, updateStockInfo } from "../render/CartSelectBox.js";
@@ -45,40 +47,36 @@ export const handleAddToCart = () => {
     existingCartItem = cartItemsContainer.querySelector(`#${selectedProductId}`);
   }
 
-  // 재고 확인
-  if (selectedProduct.stock < 1) {
-    alert(`재고가 부족합니다. 현재 재고: ${selectedProduct.stock}개`);
+  // 원본 재고 데이터로 검증 (constants.js의 PRODUCT_LIST 사용)
+  const originalProduct = PRODUCT_LIST.find(p => p.id === selectedProductId);
+  const currentCartQuantity = existingCartItem 
+    ? parseInt(existingCartItem.querySelector('.quantity-number').textContent) || 0
+    : 0;
+  
+  // 원본 재고에서 새로운 총 수량 검증
+  if (originalProduct.stock < currentCartQuantity + 1) {
+    alert('재고가 부족합니다.');
     return;
   }
 
   if (existingCartItem) {
     // 기존 상품이 있으면 수량만 증가
     const quantityElement = existingCartItem.querySelector('.quantity-number');
-    const currentQuantity = parseInt(quantityElement.textContent) || 0;
-    
-    // 재고 한 개 더 확인
-    if (selectedProduct.stock < currentQuantity + 1) {
-      alert(`재고가 부족합니다. 현재 재고: ${selectedProduct.stock}개`);
-      return;
-    }
 
     // 수량 업데이트 (DOM만)
-    quantityElement.textContent = currentQuantity + 1;
+    quantityElement.textContent = currentCartQuantity + 1;
     
     // cartList에도 추가
     addToCart(selectedProduct);
   } else {
     // 새 상품이면 cartList에 추가하고 DOM 렌더링
     addToCart(selectedProduct);
-    renderCartItemList();
+    renderCartItemList(selectedProduct);
   }
 
   // 재고 업데이트 및 UI 업데이트
   updateProductStock(selectedProductId, 1); // 재고 차감
-  updateHeaderItemCount();
-  updateCartSelectOptions();
-  updateStockInfo(selectedProductId);
-  updateCartSummary();
+  updateAllUI();
   updateLastSelectedProduct(selectedProductId);
 };
 
@@ -105,8 +103,9 @@ export const handleCartItemActions = (event) => {
     if (newQuantity > 0) {
       // 증가하는 경우: 재고 확인
       if (quantityChange > 0) {
-        // 재고가 부족한 경우 알림 표시하고 중단
-        if (product.stock < 1) {
+        // 원본 재고 데이터로 검증 (constants.js의 PRODUCT_LIST 사용)
+        const originalProduct = PRODUCT_LIST.find(p => p.id === product.id);
+        if (newQuantity > originalProduct.stock) {
           alert('재고가 부족합니다.');
           return;
         }

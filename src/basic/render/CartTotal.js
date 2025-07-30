@@ -124,6 +124,7 @@ export const updateDiscountInfo = () => {
         discountDetails.push(`${product.name}: ${(discount * 100).toFixed(1)}% 할인`);
       }
       
+
       totalAmount += itemTotal * (1 - discount);
     }
   }
