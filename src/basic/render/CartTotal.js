@@ -27,10 +27,17 @@ export const CartTotal = /*html*/ `
           <span class="text-sm uppercase tracking-wider">Total</span>
           <div id="total-price" class="text-2xl tracking-tight">₩0</div>
         </div>
-        <div id="loyalty-points" class="mt-2 text-sm text-gray-400" style="display: none;"></div>
+        <div id="loyalty-points" class="text-xs text-blue-400 mt-2 text-right" style="display: none;">적립 포인트: 0p</div>
       </div>
     </div>
   </div>
+  <button class="w-full py-4 bg-white text-black text-sm font-normal uppercase tracking-super-wide cursor-pointer mt-6 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30">
+    Proceed to Checkout
+  </button>
+  <p class="mt-4 text-2xs text-white/60 text-center leading-relaxed">
+    Free shipping on all orders.<br>
+    <span id="points-notice">Earn loyalty points with purchase.</span>
+  </p>
 `;
 
 // 주문 요약 업데이트
@@ -41,6 +48,13 @@ export const updateCartSummary = () => {
   const cartItems = document.getElementById('cart-items');
   if (!cartItems || cartItems.children.length === 0) {
     summaryDetailsElement.innerHTML = '<p class="text-sm text-gray-400">장바구니가 비어있습니다.</p>';
+    
+    // 빈 장바구니일 때 포인트 섹션 숨김 (테스트 통과를 위해)
+    const loyaltyPointsElement = document.getElementById('loyalty-points');
+    if (loyaltyPointsElement) {
+      loyaltyPointsElement.style.display = 'none';
+    }
+    
     return;
   }
 
@@ -59,7 +73,7 @@ export const updateCartSummary = () => {
       const itemTotal = product.originalPrice * quantity;
       subtotal += itemTotal;
       summaryHTML += `
-        <div class="flex justify-between text-sm">
+        <div class="flex justify-between text-xs tracking-wide text-gray-400">
           <span>${product.name} x ${quantity}</span>
           <span>₩${itemTotal.toLocaleString()}</span>
         </div>
@@ -67,7 +81,91 @@ export const updateCartSummary = () => {
     }
   }
 
+  // Subtotal 및 할인 정보 추가
+  if (subtotal > 0) {
+    summaryHTML += `
+      <div class="border-t border-white/10 my-3"></div>
+      <div class="flex justify-between text-sm tracking-wide">
+        <span>Subtotal</span>
+        <span>₩${subtotal.toLocaleString()}</span>
+      </div>
+    `;
+    
+    // 할인 정보를 summary-details에 추가
+    const totalItemCount = calculateTotalItemCount();
+    const discountDetails = calculateDiscountDetails();
+    
+    // 대량구매 할인 (30개 이상)
+    if (totalItemCount >= 30) {
+      summaryHTML += `
+        <div class="flex justify-between text-sm tracking-wide text-green-400">
+          <span class="text-xs">🎉 대량구매 할인 (30개 이상)</span>
+          <span class="text-xs">-25%</span>
+        </div>
+      `;
+    } else if (discountDetails.length > 0) {
+      // 개별 상품 할인
+      discountDetails.forEach(function (item) {
+        summaryHTML += `
+          <div class="flex justify-between text-sm tracking-wide text-green-400">
+            <span class="text-xs">${item.name} (10개↑)</span>
+            <span class="text-xs">-${item.discount}%</span>
+          </div>
+        `;
+      });
+    }
+    
+    // 화요일 할인
+    if (isTuesday() && calculateTotalPrice() > 0) {
+      summaryHTML += `
+        <div class="flex justify-between text-sm tracking-wide text-purple-400">
+          <span class="text-xs">🌟 화요일 추가 할인</span>
+          <span class="text-xs">-10%</span>
+        </div>
+      `;
+    }
+    
+    // Shipping
+    summaryHTML += `
+      <div class="flex justify-between text-sm tracking-wide text-gray-400">
+        <span>Shipping</span>
+        <span>Free</span>
+      </div>
+    `;
+  }
+
   summaryDetailsElement.innerHTML = summaryHTML;
+};
+
+// 할인 상세 정보 계산 (개별 상품 할인용)
+const calculateDiscountDetails = () => {
+  const cartItems = document.getElementById('cart-items');
+  if (!cartItems) return [];
+  
+  const discountDetails = [];
+  
+  for (let i = 0; i < cartItems.children.length; i++) {
+    const cartItem = cartItems.children[i];
+    const productId = cartItem.id;
+    const product = getProductById(productId);
+    const quantityElement = cartItem.querySelector('.quantity-number');
+    const quantity = parseInt(quantityElement.textContent) || 0;
+    
+    if (product && quantity >= 10) {
+      let discount = 0;
+      if (productId === 'p1') discount = 10;
+      else if (productId === 'p2') discount = 15;
+      else if (productId === 'p3') discount = 20;
+      else if (productId === 'p4') discount = 5;
+      else if (productId === 'p5') discount = 25;
+      
+      if (discount > 0) {
+        discountDetails.push({name: product.name, discount: discount});
+      }
+    }
+  }
+  
+  return discountDetails;
 };
 
 // 총 가격 업데이트
@@ -147,10 +245,16 @@ export const updateDiscountInfo = () => {
     discountDetails.push(`총 할인율: ${totalDiscountRate}%`);
   }
 
+  // 할인 정보를 discount-info 요소에 표시 (테스트 통과를 위해)
   if (discountDetails.length > 0) {
+    const totalDiscountRate = ((subtotal - totalAmount) / subtotal * 100).toFixed(1);
     discountInfoElement.innerHTML = `
-      <div class="text-sm text-green-400">
-        ${discountDetails.map(detail => `<div>${detail}</div>`).join('')}
+      <div class="bg-green-500/20 rounded-lg p-3">
+        <div class="flex justify-between items-center mb-1">
+          <span class="text-xs uppercase tracking-wide text-green-400">총 할인율</span>
+          <span class="text-sm font-medium text-green-400">${totalDiscountRate}%</span>
+        </div>
+        <div class="text-2xs text-gray-300">₩${Math.round(subtotal - totalAmount).toLocaleString()} 할인되었습니다</div>
       </div>
     `;
   } else {
@@ -168,8 +272,6 @@ export const updateLoyaltyPoints = () => {
     loyaltyPointsElement.style.display = 'none';
     return;
   }
-
-  loyaltyPointsElement.style.display = 'block';
 
   const totalPrice = calculateTotalPrice();
   const basePoints = calculateBasePoints(totalPrice);
@@ -193,7 +295,20 @@ export const updateLoyaltyPoints = () => {
     pointsDetails.push(bonusText);
   }
 
-  loyaltyPointsElement.innerHTML = `적립 포인트: ${totalPoints}p${pointsDetails.join(', ')}`;
+  if (totalPoints > 0) {
+    loyaltyPointsElement.innerHTML = `<div>적립 포인트: <span class="font-bold">${totalPoints}p</span></div>` +
+      `<div class="text-2xs opacity-70 mt-1">${pointsDetails.join(', ')}</div>`;
+    loyaltyPointsElement.style.display = 'block';
+  } else {
+    loyaltyPointsElement.textContent = '적립 포인트: 0p';
+    loyaltyPointsElement.style.display = 'block';
+  }
+  
+  // 장바구니가 비어있을 때 포인트 섹션 숨김 (테스트 통과를 위해)
+  const cartItemsForCheck = document.getElementById('cart-items');
+  if (!cartItemsForCheck || cartItemsForCheck.children.length === 0) {
+    loyaltyPointsElement.style.display = 'none';
+  }
 };
 
 // 화요일 특별 할인 표시
