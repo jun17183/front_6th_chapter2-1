@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
-import { Product, CartState, SaleEvent } from '../types';
-import { useProducts, useCart, useAutoEvents } from '../hooks';
+import { Product, CartState, SaleEvent } from '../types/index.js';
+import { useProducts, useCart, useAutoEvents } from '../hooks/index.js';
 import { 
   findNewSales, 
   findEndedSales, 

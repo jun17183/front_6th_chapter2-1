@@ -1,5 +1,5 @@
-import { Product, SaleEvent } from '../types';
-import { PRODUCT_LIST } from '../constants';
+import { Product, SaleEvent } from '../types/index.js';
+import { PRODUCT_LIST } from '../constants/index.js';
 
 // 랜덤 상품 선택
 export const getRandomProduct = (excludeProductId?: string): Product => {

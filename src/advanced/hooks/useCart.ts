@@ -1,6 +1,6 @@
 import { useState, useCallback, useMemo } from 'react';
-import { Product, CartItem, CartState, UseCartReturn } from '../types';
-import { usePoints } from './usePoints';
+import { Product, CartItem, CartState, UseCartReturn } from '../types/index.js';
+import { usePoints } from './usePoints.js';
 import {
   calculateItemTotal,
   shouldApplyBulkDiscount,

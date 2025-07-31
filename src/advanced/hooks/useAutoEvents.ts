@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { SaleEvent, UseAutoEventsReturn } from '../types';
-import { AUTO_EVENT_CONFIG, DISCOUNT_POLICY, EVENT_CONSTANTS } from '../constants';
+import { SaleEvent, UseAutoEventsReturn } from '../types/index.js';
+import { AUTO_EVENT_CONFIG, DISCOUNT_POLICY, EVENT_CONSTANTS } from '../constants/index.js';
 import { 
   getRandomProduct, 
   createSaleEvent, 

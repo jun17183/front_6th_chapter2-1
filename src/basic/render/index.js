@@ -1,8 +1,8 @@
-import { Header } from './Header';
-import { CartSelectBox, updateCartSelectOptions } from './CartSelectBox';
-import { CartItemList } from './CartItemList';
-import { CartTotal } from './CartTotal';
-import { ManualToggleButton, Manual } from './Manual';
+import { Header } from './Header.js';
+import { CartSelectBox, updateCartSelectOptions } from './CartSelectBox.js';
+import { CartItemList } from './CartItemList.js';
+import { CartTotal } from './CartTotal.js';
+import { ManualToggleButton, Manual } from './Manual.js';
 
 export const initializeRender = () => {
   // 메인 레이아웃 렌더링

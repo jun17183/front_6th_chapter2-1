@@ -14,11 +14,6 @@ export default defineConfig({
         basic: './index.basic.html',
         advanced: './index.advanced.html'
       },
-      output: {
-        // 확장자 자동 추가
-        entryFileNames: 'assets/[name]-[hash].js',
-        chunkFileNames: 'assets/[name]-[hash].js'
-      }
     }
   },
   test: {

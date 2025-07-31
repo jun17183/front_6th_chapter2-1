@@ -1,5 +1,5 @@
-import { Product } from './entity';
-import { SaleEvent } from './events';
+import { Product } from './entity.js';
+import { SaleEvent } from './events.js';
 
 // ============== UI 상태 타입 ==============
 

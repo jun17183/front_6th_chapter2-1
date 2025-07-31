@@ -1,6 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
-import App from './App';
+import App from './App.js';
 
 // DOM 요소 확인
 const container = document.getElementById('app');

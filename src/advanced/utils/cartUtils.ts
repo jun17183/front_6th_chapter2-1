@@ -1,5 +1,5 @@
-import { CartItem, DiscountInfo } from '../types';
-import { CART_CONSTANTS, DAYS_OF_WEEK } from '../constants';
+import { CartItem, DiscountInfo } from '../types/index.js';
+import { CART_CONSTANTS, DAYS_OF_WEEK } from '../constants/index.js';
 
 // ============== 장바구니 관련 유틸리티 함수들 ==============
 

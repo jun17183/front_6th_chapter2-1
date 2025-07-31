@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { AppProvider, useAppContext } from './context/AppContext';
-import { Header, ProductSelect, CartItemList, CartTotal, HelpModal } from './components';
-import { PRODUCT_LIST } from './constants';
+import { AppProvider, useAppContext } from './context/AppContext.js';
+import { Header, ProductSelect, CartItemList, CartTotal, HelpModal } from './components/index.js';
+import { PRODUCT_LIST } from './constants/index.js';
 // import { formatPrice } from './utils/formatUtils';
 
 /**

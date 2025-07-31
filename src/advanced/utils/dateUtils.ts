@@ -1,4 +1,4 @@
-import { DAYS_OF_WEEK } from '../constants';
+import { DAYS_OF_WEEK } from '../constants/index.js';
 
 // 현재 날짜가 화요일인지 확인
 export const isTuesday = (): boolean => {

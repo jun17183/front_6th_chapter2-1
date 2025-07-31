@@ -1,6 +1,6 @@
-import { CartItem } from '../types';
-import { POINTS_POLICY, PRODUCT_IDS } from '../constants';
-import { isTuesday } from './dateUtils';
+import { CartItem } from '../types/index.js';
+import { POINTS_POLICY, PRODUCT_IDS } from '../constants/index.js';
+import { isTuesday } from './dateUtils.js';
 
 // ============== 포인트 계산 관련 유틸리티 함수들 ==============
 

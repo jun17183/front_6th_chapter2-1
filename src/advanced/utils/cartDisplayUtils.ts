@@ -1,6 +1,6 @@
-import { CartItem } from '../types';
-import { UI_CONSTANTS } from '../constants/ui';
-import { getProductSaleStatus, getProductNamePrefix, getProductPriceColorClass } from './productUtils';
+import { CartItem } from '../types/index.js';
+import { UI_CONSTANTS } from '../constants/ui.js';
+import { getProductSaleStatus, getProductNamePrefix, getProductPriceColorClass } from './productUtils.js';
 
 // ============== 장바구니 표시 관련 유틸리티 함수들 ==============
 

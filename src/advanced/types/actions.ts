@@ -1,4 +1,4 @@
-import { Product } from './entity';
+import { Product } from './entity.js';
 
 // ============== 액션 타입 ==============
 

@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
-import { CartState, DiscountInfo, UseDiscountReturn } from '../types';
-import { createDiscountInfo } from '../utils/discountUtils';
+import { CartState, DiscountInfo, UseDiscountReturn } from '../types/index.js';
+import { createDiscountInfo } from '../utils/discountUtils.js';
 
 /**
  * 할인 계산을 위한 커스텀 훅

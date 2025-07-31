@@ -1,6 +1,6 @@
-import { CartItem } from './entity';
-import { DiscountInfo } from './discount';
-import { PointsInfo } from './points';
+import { CartItem } from './entity.js';
+import { DiscountInfo } from './discount.js';
+import { PointsInfo } from './points.js';
 
 // ============== 장바구니 상태 타입 ==============
 

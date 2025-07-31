@@ -1,8 +1,8 @@
-import { Product } from './entity';
-import { CartState } from './cart';
-import { SaleEvent } from './events';
-import { DiscountInfo } from './discount';
-import { PointsInfo } from './points';
+import { Product } from './entity.js';
+import { CartState } from './cart.js';
+import { SaleEvent } from './events.js';
+import { DiscountInfo } from './discount.js';
+import { PointsInfo } from './points.js';
 
 // ============== 훅 반환 타입 ==============
 

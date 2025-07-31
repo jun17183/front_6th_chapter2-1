@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
-import { Product, UseProductsReturn } from '../types';
-import { PRODUCT_LIST, LOW_STOCK_THRESHOLD, DISCOUNT_POLICY } from '../constants';
-import { calculateDiscountedPrice } from '../utils';
+import { Product, UseProductsReturn } from '../types/index.js';
+import { PRODUCT_LIST, LOW_STOCK_THRESHOLD, DISCOUNT_POLICY } from '../constants/index.js';
+import { calculateDiscountedPrice } from '../utils/index.js';
 
 /**
  * 상품 관리를 위한 커스텀 훅
