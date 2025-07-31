@@ -2,8 +2,8 @@
 
 ## 🚀 Live Demo
 
-- **Basic Version**: [https://[your-github-username].github.io/front_6th_chapter2-1/index.basic.html](https://[your-github-username].github.io/front_6th_chapter2-1/index.basic.html)
-- **Advanced Version**: [https://[your-github-username].github.io/front_6th_chapter2-1/index.advanced.html](https://[your-github-username].github.io/front_6th_chapter2-1/index.advanced.html)
+- **Basic Version**: [https://jun17183.github.io/front_6th_chapter2-1/index.basic.html](https://jun17183.github.io/front_6th_chapter2-1/index.basic.html)
+- **Advanced Version**: [https://jun17183.github.io/front_6th_chapter2-1/index.advanced.html](https://jun17183.github.io/front_6th_chapter2-1/index.advanced.html)
 
 ## 📋 프로젝트 개요
 
