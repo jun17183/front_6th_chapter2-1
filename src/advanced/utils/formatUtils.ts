@@ -1,32 +1,22 @@
-/**
- * 숫자를 한국 통화 형식으로 포맷팅합니다.
- */
+// 숫자 포맷팅
 export const formatCurrency = (amount: number): string => {
   return `₩${amount.toLocaleString()}`;
 };
 
-/**
- * 할인율을 퍼센트 형식으로 포맷팅합니다.
- */
+// 할인율 포맷팅
 export const formatDiscountRate = (rate: number): string => {
   return `${(rate * 100).toFixed(1)}%`;
 };
 
-/**
- * 아이템 수량을 복수형으로 포맷팅합니다.
- */
+// 아이템 수량 포맷팅
 export const formatItemCount = (count: number): string => {
   return `${count} item${count !== 1 ? 's' : ''}`;
 };
 
-/**
- * 포인트를 포맷팅합니다.
- */
+// 포인트 포맷팅
 export const formatPoints = (points: number): string => {
   return `${points}p`;
 };
 
-/**
- * 가격을 포맷팅합니다.
- */
+// 가격 포맷팅
 export const formatPrice = formatCurrency;

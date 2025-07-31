@@ -1,7 +1,6 @@
 import { useCallback } from 'react';
 import { CartState, DiscountInfo, UseDiscountReturn } from '../types';
-import { DISCOUNT_POLICY, PRODUCT_DISCOUNT_RATE, PRODUCT_IDS } from '../constants';
-import { isTuesday } from '../utils/dateUtils';
+import { createDiscountInfo } from '../utils/discountUtils';
 
 /**
  * 할인 계산을 위한 커스텀 훅
@@ -15,68 +14,7 @@ export const useDiscount = (): UseDiscountReturn => {
       return null;
     }
 
-    let discountRate = 0;
-    let discountType: DiscountInfo['type'] = 'individual';
-    let description = '';
-
-    // 1. 대량구매 할인 확인 (30개 이상) - 최우선
-    if (totalItemCount >= DISCOUNT_POLICY.BULK_PURCHASE_THRESHOLD) {
-      discountRate = DISCOUNT_POLICY.BULK_PURCHASE_RATE;
-      discountType = 'bulk';
-      description = `대량구매 할인 (${totalItemCount}개)`;
-    } else {
-      // 2. 개별 상품 할인 확인 (10개 이상)
-      let maxIndividualDiscount = 0;
-      let discountedProduct = '';
-
-      items.forEach(item => {
-        if (item.quantity >= DISCOUNT_POLICY.INDIVIDUAL_DISCOUNT_THRESHOLD) {
-          const productDiscountRate = PRODUCT_DISCOUNT_RATE[item.id] || 0;
-          if (productDiscountRate > maxIndividualDiscount) {
-            maxIndividualDiscount = productDiscountRate;
-            discountedProduct = item.name;
-          }
-        }
-      });
-
-      if (maxIndividualDiscount > 0) {
-        discountRate = maxIndividualDiscount;
-        discountType = 'individual';
-        description = `개별 상품 할인: ${discountedProduct}`;
-      }
-    }
-
-    // 3. 화요일 할인 추가 적용
-    if (isTuesday() && discountRate > 0) {
-      // 화요일 할인은 기존 할인과 중복 적용
-      // 예: 10% 할인 -> 10% 화요일 할인 = 19% (1 - 0.9 * 0.9 = 0.19)
-      const finalRate = 1 - (1 - discountRate) * (1 - DISCOUNT_POLICY.TUESDAY_DISCOUNT_RATE);
-      discountRate = finalRate;
-      discountType = 'tuesday';
-      description += ' + 화요일 할인';
-    } else if (isTuesday() && discountRate === 0) {
-      // 다른 할인이 없는 경우 화요일 할인만 적용
-      discountRate = DISCOUNT_POLICY.TUESDAY_DISCOUNT_RATE;
-      discountType = 'tuesday';
-      description = '화요일 할인';
-    }
-
-    if (discountRate === 0) {
-      return null;
-    }
-
-    // 할인 금액 계산
-    const subtotal = items.reduce((acc, item) => 
-      acc + (item.originalPrice * item.quantity), 0
-    );
-    const discountAmount = Math.round(subtotal * discountRate);
-
-    return {
-      rate: discountRate,
-      amount: discountAmount,
-      type: discountType,
-      description,
-    };
+    return createDiscountInfo(items, totalItemCount);
   }, []);
 
   const applyLightningSale = useCallback((productId: string) => {

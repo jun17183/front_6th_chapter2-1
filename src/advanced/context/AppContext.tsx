@@ -1,6 +1,13 @@
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef, ReactNode } from 'react';
 import { Product, CartState, SaleEvent } from '../types';
 import { useProducts, useCart, useAutoEvents } from '../hooks';
+import { 
+  findNewSales, 
+  findEndedSales, 
+  handleNewSales, 
+  handleEndedSales,
+  SaleEventHandlers 
+} from '../utils/saleEventUtils';
 
 interface AppContextType {
   // 상품 관련
@@ -78,42 +85,26 @@ export const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
     // updateStock(product.id, 1); // Basic 모듈과 동일하게 재고 변화 없음
   }, [originalAddToCart]);
 
+  // 세일 이벤트 핸들러 객체 생성
+  const saleEventHandlers: SaleEventHandlers = {
+    startLightningSale,
+    startSuggestedSale,
+    resetSaleStatus,
+  };
+
   // activeSales 변경 시 상품 세일 상태 업데이트
   useEffect(() => {
-    // 새로운 세일 이벤트 확인 및 alert 표시
-    activeSales.forEach(sale => {
-      const isNewSale = !previousSalesRef.current.some(
-        prevSale => prevSale.productId === sale.productId && prevSale.type === sale.type
-      );
-      
-      if (isNewSale) {
-        const product = getProductById(sale.productId);
-        if (product) {
-          if (sale.type === 'lightning') {
-            alert(`⚡번개세일! ${product.name}이(가) 20% 할인 중입니다!`);
-            startLightningSale(sale.productId);
-          } else if (sale.type === 'suggested') {
-            alert(`💝 ${product.name}은(는) 어떠세요? 지금 구매하시면 5% 추가 할인!`);
-            startSuggestedSale(sale.productId);
-          }
-        }
-      }
-    });
+    // 새로운 세일 이벤트 확인 및 처리
+    const newSales = findNewSales(activeSales, previousSalesRef.current);
+    handleNewSales(newSales, getProductById, saleEventHandlers);
 
-    // 종료된 세일 상태 초기화
-    previousSalesRef.current.forEach(prevSale => {
-      const isStillActive = activeSales.some(
-        sale => sale.productId === prevSale.productId && sale.type === prevSale.type
-      );
-      
-      if (!isStillActive) {
-        resetSaleStatus(prevSale.productId);
-      }
-    });
+    // 종료된 세일 이벤트 확인 및 처리
+    const endedSales = findEndedSales(activeSales, previousSalesRef.current);
+    handleEndedSales(endedSales, saleEventHandlers);
 
     // 이전 상태 업데이트
     previousSalesRef.current = [...activeSales];
-  }, [activeSales, getProductById, startLightningSale, startSuggestedSale, resetSaleStatus]);
+  }, [activeSales, getProductById, saleEventHandlers]);
 
   // products 변경 시 장바구니 아이템 가격 업데이트
   useEffect(() => {

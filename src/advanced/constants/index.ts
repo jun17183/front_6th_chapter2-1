@@ -6,6 +6,15 @@ import {
   AutoEventConfig 
 } from '../types';
 
+// 이벤트 관련 상수 export
+export { EVENT_CONSTANTS } from './events';
+
+// 장바구니 관련 상수 export
+export { CART_CONSTANTS } from './cart';
+
+// UI 관련 상수 export
+export { UI_CONSTANTS } from './ui';
+
 // ===== 상품 아이디 상수 =====
 export const PRODUCT_IDS = {
   KEYBOARD: 'p1',

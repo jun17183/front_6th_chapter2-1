@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { Product, UseProductsReturn } from '../types';
-import { PRODUCT_LIST, LOW_STOCK_THRESHOLD } from '../constants';
+import { PRODUCT_LIST, LOW_STOCK_THRESHOLD, DISCOUNT_POLICY } from '../constants';
+import { calculateDiscountedPrice } from '../utils';
 
 /**
  * 상품 관리를 위한 커스텀 훅
@@ -42,7 +43,7 @@ export const useProducts = (): UseProductsReturn => {
           ? { 
               ...product, 
               isOnSale: true, 
-              price: Math.round(product.originalPrice * 0.8) // 20% 할인
+              price: calculateDiscountedPrice(product.originalPrice, DISCOUNT_POLICY.LIGHTNING_SALE_RATE)
             }
           : product
       )
@@ -57,7 +58,7 @@ export const useProducts = (): UseProductsReturn => {
           ? { 
               ...product, 
               isSuggestedSale: true, 
-              price: Math.round(product.originalPrice * 0.95) // 5% 할인
+              price: calculateDiscountedPrice(product.originalPrice, DISCOUNT_POLICY.SUGGESTED_SALE_RATE)
             }
           : product
       )

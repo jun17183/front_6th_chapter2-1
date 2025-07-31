@@ -1,94 +1,114 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { SaleEvent, UseAutoEventsReturn } from '../types';
-import { AUTO_EVENT_CONFIG, DISCOUNT_POLICY, PRODUCT_LIST } from '../constants';
+import { AUTO_EVENT_CONFIG, DISCOUNT_POLICY, EVENT_CONSTANTS } from '../constants';
+import { 
+  getRandomProduct, 
+  createSaleEvent, 
+  filterExistingEvents 
+} from '../utils';
 
-/**
- * 자동 이벤트 (번개세일, 추천할인)를 위한 커스텀 훅
- */
+// 타이머 타입
+type TimerRef = React.MutableRefObject<number | null>;
+
+// 타이머 정리
+const clearTimer = (timerRef: TimerRef): void => {
+  if (timerRef.current) {
+    clearTimeout(timerRef.current);
+    clearInterval(timerRef.current);
+    timerRef.current = EVENT_CONSTANTS.TIMER_INITIAL;
+  }
+};
+
+// 자동 이벤트 (번개세일, 추천할인)를 위한 커스텀 훅
 export const useAutoEvents = (): UseAutoEventsReturn => {
   const [activeSales, setActiveSales] = useState<SaleEvent[]>([]);
-  const lightningTimerRef = useRef<number | null>(null);
-  const suggestedTimerRef = useRef<number | null>(null);
-  const isRunningRef = useRef(false);
+  const lightningTimerRef = useRef<number | null>(EVENT_CONSTANTS.TIMER_INITIAL);
+  const suggestedTimerRef = useRef<number | null>(EVENT_CONSTANTS.TIMER_INITIAL);
+  const isRunningRef = useRef<boolean>(EVENT_CONSTANTS.EVENT_STATUS.STOPPED);
 
-  const startAutoEvents = useCallback((lastSelectedProductId: string) => {
-    if (isRunningRef.current) return;
-    
-    isRunningRef.current = true;
-
-    // 번개세일 타이머 시작
-    lightningTimerRef.current = setTimeout(() => {
-      const interval = setInterval(() => {
-        // 랜덤 상품 선택하여 번개세일 적용
-        const randomProduct = PRODUCT_LIST[Math.floor(Math.random() * PRODUCT_LIST.length)];
-        const lightningEvent: SaleEvent = {
-          type: 'lightning',
-          productId: randomProduct.id,
-          originalPrice: randomProduct.originalPrice,
-          discountedPrice: Math.round(randomProduct.originalPrice * (1 - DISCOUNT_POLICY.LIGHTNING_SALE_RATE)),
-          discountRate: DISCOUNT_POLICY.LIGHTNING_SALE_RATE,
-          startTime: new Date(),
-        };
-        
-        setActiveSales(prev => {
-          // 같은 상품의 기존 번개세일 제거
-          const filtered = prev.filter(sale => 
-            !(sale.productId === lightningEvent.productId && sale.type === 'lightning')
-          );
-          return [...filtered, lightningEvent];
-        });
-      }, AUTO_EVENT_CONFIG.LIGHTNING_SALE_INTERVAL);
-
-      // 정리 함수 저장
-      lightningTimerRef.current = interval;
-    }, AUTO_EVENT_CONFIG.LIGHTNING_SALE_DELAY);
-
-    // 추천할인 타이머 시작
-    if (lastSelectedProductId) {
-      suggestedTimerRef.current = setTimeout(() => {
-        const interval = setInterval(() => {
-          // 마지막 선택 상품과 다른 상품에 추천할인 적용
-          const availableProducts = PRODUCT_LIST.filter(p => p.id !== lastSelectedProductId);
-          if (availableProducts.length > 0) {
-            const suggestedProduct = availableProducts[Math.floor(Math.random() * availableProducts.length)];
-            const suggestedEvent: SaleEvent = {
-              type: 'suggested',
-              productId: suggestedProduct.id,
-              originalPrice: suggestedProduct.originalPrice,
-              discountedPrice: Math.round(suggestedProduct.originalPrice * (1 - DISCOUNT_POLICY.SUGGESTED_SALE_RATE)),
-              discountRate: DISCOUNT_POLICY.SUGGESTED_SALE_RATE,
-              startTime: new Date(),
-            };
-            
-            setActiveSales(prev => {
-              const filtered = prev.filter(sale => 
-                !(sale.productId === suggestedEvent.productId && sale.type === 'suggested')
-              );
-              return [...filtered, suggestedEvent];
-            });
-          }
-        }, AUTO_EVENT_CONFIG.SUGGESTED_SALE_INTERVAL);
-
-        suggestedTimerRef.current = interval;
-      }, AUTO_EVENT_CONFIG.SUGGESTED_SALE_DELAY);
+  // 번개세일 이벤트 생성 및 적용
+  const createLightningSaleEvent = useCallback((): void => {
+    try {
+      const randomProduct = getRandomProduct();
+      const lightningEvent = createSaleEvent(
+        'lightning',
+        randomProduct,
+        DISCOUNT_POLICY.LIGHTNING_SALE_RATE
+      );
+      
+      setActiveSales(prev => {
+        const filtered = filterExistingEvents(prev, lightningEvent);
+        return [...filtered, lightningEvent];
+      });
+    } catch (error) {
+      console.error('번개세일 이벤트 생성 실패:', error);
     }
   }, []);
 
-  const stopAutoEvents = useCallback(() => {
-    isRunningRef.current = false;
+  // 추천할인 이벤트 생성 및 적용
+  const createSuggestedSaleEvent = useCallback((excludeProductId: string): void => {
+    try {
+      const suggestedProduct = getRandomProduct(excludeProductId);
+      const suggestedEvent = createSaleEvent(
+        'suggested',
+        suggestedProduct,
+        DISCOUNT_POLICY.SUGGESTED_SALE_RATE
+      );
+      
+      setActiveSales(prev => {
+        const filtered = filterExistingEvents(prev, suggestedEvent);
+        return [...filtered, suggestedEvent];
+      });
+    } catch (error) {
+      console.error('추천할인 이벤트 생성 실패:', error);
+    }
+  }, []);
+
+  // 번개세일 타이머 설정
+  const setupLightningSaleTimer = useCallback((): void => {
+    lightningTimerRef.current = setTimeout(() => {
+      const interval = setInterval(createLightningSaleEvent, AUTO_EVENT_CONFIG.LIGHTNING_SALE_INTERVAL);
+      lightningTimerRef.current = interval;
+    }, AUTO_EVENT_CONFIG.LIGHTNING_SALE_DELAY);
+  }, [createLightningSaleEvent]);
+
+  // 추천할인 타이머 설정
+  const setupSuggestedSaleTimer = useCallback((lastSelectedProductId: string): void => {
+    if (!lastSelectedProductId) return;
     
-    if (lightningTimerRef.current) {
-      clearTimeout(lightningTimerRef.current);
-      clearInterval(lightningTimerRef.current);
-      lightningTimerRef.current = null;
+    suggestedTimerRef.current = setTimeout(() => {
+      const interval = setInterval(
+        () => createSuggestedSaleEvent(lastSelectedProductId),
+        AUTO_EVENT_CONFIG.SUGGESTED_SALE_INTERVAL
+      );
+      suggestedTimerRef.current = interval;
+    }, AUTO_EVENT_CONFIG.SUGGESTED_SALE_DELAY);
+  }, [createSuggestedSaleEvent]);
+
+  // 자동 이벤트 시작
+  const startAutoEvents = useCallback((lastSelectedProductId: string): void => {
+    if (isRunningRef.current) {
+      console.warn('자동 이벤트가 이미 실행 중입니다.');
+      return;
     }
     
-    if (suggestedTimerRef.current) {
-      clearTimeout(suggestedTimerRef.current);
-      clearInterval(suggestedTimerRef.current);
-      suggestedTimerRef.current = null;
-    }
+    isRunningRef.current = EVENT_CONSTANTS.EVENT_STATUS.RUNNING;
     
+    try {
+      setupLightningSaleTimer();
+      setupSuggestedSaleTimer(lastSelectedProductId);
+    } catch (error) {
+      console.error('자동 이벤트 시작 실패:', error);
+      isRunningRef.current = EVENT_CONSTANTS.EVENT_STATUS.STOPPED;
+    }
+  }, [setupLightningSaleTimer, setupSuggestedSaleTimer]);
+
+  // 자동 이벤트 중지
+  const stopAutoEvents = useCallback((): void => {
+    isRunningRef.current = EVENT_CONSTANTS.EVENT_STATUS.STOPPED;
+    
+    clearTimer(lightningTimerRef);
+    clearTimer(suggestedTimerRef);
     setActiveSales([]);
   }, []);
 
