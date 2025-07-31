@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
-import react from '@vitejs/plugin-react';
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   base: '/front_6th_chapter2-1/',
@@ -7,9 +7,9 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        'index': './index.html',
-        'index.basic': './index.basic.html',
-        'index.advanced': './index.advanced.html'
+        main: './index.html',
+        basic: './index.basic.html',
+        advanced: './index.advanced.html'
       }
     }
   },
