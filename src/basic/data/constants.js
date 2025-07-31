@@ -27,7 +27,7 @@ export const PRODUCT_LIST = [
   },
   {
     id: PRODUCT_MONITOR_ARM, 
-    name: "거북목 탈출 모니터암", 
+    name: '거북목 탈출 모니터암', 
     price: 30000, 
     originalPrice: 30000, 
     stock: 20, 
@@ -36,7 +36,7 @@ export const PRODUCT_LIST = [
   },
   {
     id: PRODUCT_LAPTOP_POUCH, 
-    name: "에러 방지 노트북 파우치", 
+    name: '에러 방지 노트북 파우치', 
     price: 15000, 
     originalPrice: 15000, 
     stock: 0, 
@@ -45,7 +45,7 @@ export const PRODUCT_LIST = [
   },
   {
     id: PRODUCT_SPEAKER,
-    name: `코딩할 때 듣는 Lo-Fi 스피커`,
+    name: '코딩할 때 듣는 Lo-Fi 스피커',
     price: 25000,
     originalPrice: 25000,
     stock: 10,

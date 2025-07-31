@@ -3,6 +3,7 @@ import {
   getLowStockItems, 
   calculateTotalStock 
 } from "../data/index.js";
+import { UI_CONSTANTS } from "./constants.js";
 
 export const CartSelectBox = /*html*/ `
   <div class="mb-6 pb-6 border-b border-gray-200">
@@ -11,7 +12,7 @@ export const CartSelectBox = /*html*/ `
     <button id="add-to-cart" class="w-full py-3 bg-black text-white text-sm font-medium uppercase tracking-wider hover:bg-gray-800 transition-all">
       Add to Cart
     </button>
-    <div id="stock-status" class="text-xs text-red-500 mt-3 whitespace-pre-line"></div>
+    <div id="stock-status" class="text-xs ${UI_CONSTANTS.COLORS.ERROR_TEXT} mt-3 whitespace-pre-line"></div>
   </div>
 `;
 
@@ -42,18 +43,18 @@ export const updateCartSelectOptions = () => {
     if (product.stock === 0) {
       optionElement.textContent = `${product.name} - ${product.price}원 (품절)${discountText}`;
       optionElement.disabled = true;
-      optionElement.className = 'text-gray-400';
+      optionElement.className = UI_CONSTANTS.COLORS.LIGHT_GRAY_TEXT;
     } else {
       // 할인 상품 표시
       if (product.isOnSale && product.isSuggestedSale) {
         optionElement.textContent = `⚡💝${product.name} - ${product.originalPrice}원 → ${product.price}원 (25% SUPER SALE!)`;
-        optionElement.className = 'text-purple-600 font-bold';
+        optionElement.className = UI_CONSTANTS.COLORS.DUAL_SALE_PRICE + ' font-bold';
       } else if (product.isOnSale) {
         optionElement.textContent = `⚡${product.name} - ${product.originalPrice}원 → ${product.price}원 (20% SALE!)`;
-        optionElement.className = 'text-red-500 font-bold';
+        optionElement.className = UI_CONSTANTS.COLORS.SALE_PRICE + ' font-bold';
       } else if (product.isSuggestedSale) {
         optionElement.textContent = `💝${product.name} - ${product.originalPrice}원 → ${product.price}원 (5% 추천!)`;
-        optionElement.className = 'text-blue-500 font-bold';
+        optionElement.className = UI_CONSTANTS.COLORS.SUGGESTED_PRICE + ' font-bold';
       } else {
         optionElement.textContent = `${product.name} - ${product.price}원${discountText}`;
       }

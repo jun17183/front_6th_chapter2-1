@@ -17,7 +17,7 @@ import {
   updateLoyaltyPoints,
   updateTuesdaySpecial
 } from "../render/CartTotal.js";
-import { renderCartItemList } from "../render/CartItemList.js";
+import { addCartItem } from "../render/CartItemList.js";
 import { updateLastSelectedProduct } from "./Auto.js";
 
 // 장바구니에 상품 추가
@@ -71,7 +71,7 @@ export const handleAddToCart = () => {
   } else {
     // 새 상품이면 cartList에 추가하고 DOM 렌더링
     addToCart(selectedProduct);
-    renderCartItemList(selectedProduct);
+    addCartItem(selectedProduct);
   }
 
   // 재고 업데이트 및 UI 업데이트
