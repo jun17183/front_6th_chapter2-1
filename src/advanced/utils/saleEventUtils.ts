@@ -1,5 +1,5 @@
-import { SaleEvent, Product } from '../types';
-import { DISCOUNT_POLICY } from '../constants';
+import { SaleEvent, Product } from '../types/index.js';
+import { DISCOUNT_POLICY } from '../constants/index.js';
 
 // ============== 세일 이벤트 처리 관련 유틸리티 함수들 ==============
 

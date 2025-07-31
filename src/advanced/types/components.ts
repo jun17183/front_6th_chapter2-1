@@ -1,7 +1,7 @@
-import { Product } from './entity';
-import { CartItem } from './entity';
-import { CartState } from './cart';
-import { SaleEvent } from './events';
+import { Product } from './entity.js';
+import { CartItem } from './entity.js';
+import { CartState } from './cart.js';
+import { SaleEvent } from './events.js';
 
 // ============== 컴포넌트 Props 타입 ==============
 

@@ -1,7 +1,7 @@
 import React from 'react';
-import { CartItem } from '../types';
-import { UI_CONSTANTS } from '../constants';
-import { getCartItemNamePrefix } from '../utils';
+import { CartItem } from '../types/index.js';
+import { UI_CONSTANTS } from '../constants/index.js';
+import { getCartItemNamePrefix } from '../utils/index.js';
 
 interface CartItemInfoProps {
   item: CartItem;

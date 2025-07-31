@@ -1,12 +1,12 @@
 import { useCallback } from 'react';
-import { CartState, PointsInfo, UsePointsReturn } from '../types';
+import { CartState, PointsInfo, UsePointsReturn } from '../types/index.js';
 import { 
   calculateBasePoints, 
   calculateProductBonus, 
   calculateBulkBonus, 
   generatePointDescriptions 
-} from '../utils/pointsUtils';
-import { isTuesday } from '../utils/dateUtils';
+} from '../utils/pointsUtils.js';
+import { isTuesday } from '../utils/dateUtils.js';
 
 /**
  * 포인트 계산을 위한 커스텀 훅

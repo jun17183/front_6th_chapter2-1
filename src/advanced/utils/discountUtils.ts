@@ -1,6 +1,6 @@
-import { CartItem, DiscountInfo } from '../types';
-import { DISCOUNT_POLICY, PRODUCT_DISCOUNT_RATE } from '../constants';
-import { isTuesday } from './dateUtils';
+import { CartItem, DiscountInfo } from '../types/index.js';
+import { DISCOUNT_POLICY, PRODUCT_DISCOUNT_RATE } from '../constants/index.js';
+import { isTuesday } from './dateUtils.js';
 
 // ============== 할인 계산 관련 유틸리티 함수들 ==============
 

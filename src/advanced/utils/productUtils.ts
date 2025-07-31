@@ -1,5 +1,5 @@
-import { Product } from '../types';
-import { UI_CONSTANTS } from '../constants/ui';
+import { Product } from '../types/index.js';
+import { UI_CONSTANTS } from '../constants/ui.js';
 
 // ============== 상품 관련 유틸리티 함수들 ==============
 

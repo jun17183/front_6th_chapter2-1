@@ -1,10 +1,10 @@
 import React from 'react';
-import { CartItem } from '../types';
-import { createCartItemPriceDisplay } from '../utils';
-import { CartItemImage } from './CartItemImage';
-import { CartItemInfo } from './CartItemInfo';
-import { CartItemControls } from './CartItemControls';
-import { CartItemPrice } from './CartItemPrice';
+import { CartItem } from '../types/index.js';
+import { createCartItemPriceDisplay } from '../utils/index.js';
+import { CartItemImage } from './CartItemImage.js';
+import { CartItemInfo } from './CartItemInfo.js';
+import { CartItemControls } from './CartItemControls.js';
+import { CartItemPrice } from './CartItemPrice.js';
 
 interface CartItemListProps {
   items: CartItem[];
